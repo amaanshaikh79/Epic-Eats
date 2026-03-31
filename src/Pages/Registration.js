@@ -67,7 +67,7 @@ const Registration = () => {
       setPassword("")
       setConfirmPassword("")
 
-      navigate("/hero")
+      navigate("/")
     } catch (err) {
       setError({ server: err.message })
     } finally {

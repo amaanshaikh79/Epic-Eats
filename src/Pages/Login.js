@@ -30,7 +30,7 @@ const Login = () => {
 
       setEmail("")
       setPassword("")
-      navigate("/hero")
+      navigate("/")
     } catch (err) {
       setError(err.message)
     } finally {

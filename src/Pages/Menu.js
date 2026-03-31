@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { getMenuItems } from "../utils/api.js"
 import { addToCart as addItemToCart, getCart, getCartTotal, getCartItemCount } from "../utils/cart.js"
 import "../css/Menu.css"
@@ -193,14 +194,14 @@ const Menu = () => {
       {/* Floating Cart Button */}
       {cartCount > 0 && (
         <div className="floating-cart">
-          <a href="/cart" className="cart-button">
+          <Link to="/cart" className="cart-button">
             <span className="cart-icon">🛒</span>
             <span className="cart-info">
               <span className="cart-count">{cartCount} items</span>
               <span className="cart-total">₹{cartTotal}</span>
             </span>
             <span className="view-cart">View Cart</span>
-          </a>
+          </Link>
         </div>
       )}
 

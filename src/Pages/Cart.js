@@ -32,7 +32,7 @@ const Cart = () => {
         }
     }, [])
 
-    const subtotal = getCartTotal()
+    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
     const deliveryFee = subtotal >= 500 ? 0 : 40
     const total = subtotal + deliveryFee
 

@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "../css/Home.css"
 
 
 const Home = () => {
+  const navigate = useNavigate()
+
   return (
     <div className="home">
 
@@ -24,11 +26,11 @@ const Home = () => {
                 placeholder="Search for restaurants, cuisines..."
                 className="hero-search-input"
                 readOnly
-                onClick={() => window.location.href = '/menu'}
+                onClick={() => navigate('/menu')}
               />
               <button
                 className="hero-search-btn"
-                onClick={() => window.location.href = '/menu'}
+                onClick={() => navigate('/menu')}
               >
                 Find Food
               </button>

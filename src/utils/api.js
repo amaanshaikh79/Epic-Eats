@@ -60,11 +60,11 @@ export const apiFetch = async (endpoint, options = {}) => {
 };
 
 // Special fetch for FormData (image uploads — no Content-Type header)
-export const apiFormFetch = async (endpoint, formData) => {
+export const apiFormFetch = async (endpoint, formData, method = "POST") => {
     const token = getToken();
 
     const config = {
-        method: "POST",
+        method,
         headers: {
             ...(token && { Authorization: `Bearer ${token}` }),
         },
@@ -142,31 +142,11 @@ export const adminGetProducts = (params) => {
     return apiFetch(`/api/admin/products${qs ? `?${qs}` : ""}`);
 };
 
-export const adminCreateProduct = (formData) => {
-    const token = getToken();
-    return fetch(`${BASE_URL}/api/admin/products`, {
-        method: "POST",
-        headers: { ...(token && { Authorization: `Bearer ${token}` }) },
-        body: formData,
-    }).then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed to create product");
-        return data;
-    });
-};
+export const adminCreateProduct = (formData) =>
+    apiFormFetch("/api/admin/products", formData, "POST");
 
-export const adminUpdateProduct = (id, formData) => {
-    const token = getToken();
-    return fetch(`${BASE_URL}/api/admin/products/${id}`, {
-        method: "PUT",
-        headers: { ...(token && { Authorization: `Bearer ${token}` }) },
-        body: formData,
-    }).then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed to update product");
-        return data;
-    });
-};
+export const adminUpdateProduct = (id, formData) =>
+    apiFormFetch(`/api/admin/products/${id}`, formData, "PUT");
 
 export const adminDeleteProduct = (id) =>
     apiFetch(`/api/admin/products/${id}`, { method: "DELETE" });

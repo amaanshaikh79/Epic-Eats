@@ -251,8 +251,11 @@
   font-size: 0.88rem;
   line-height: 1.5;
   margin-bottom: 16px;
+  /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
+  /* autoprefixer: ignore next */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
