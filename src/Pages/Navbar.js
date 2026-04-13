@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import { isLoggedIn, removeToken, getStoredUser } from "../utils/api.js"
+import { isLoggedIn, removeToken, getStoredUser, logoutUser } from "../utils/api.js"
 import { getCartItemCount } from "../utils/cart.js"
 import "../css/Navbar.css"
 
@@ -32,7 +32,12 @@ const Navbar = () => {
   const toggleMenu = () => setMenuOpen(!menuOpen)
   const closeMenu = () => setMenuOpen(false)
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+    } catch {
+      // Even if server logout fails, clear local state
+    }
     removeToken()
     setLoggedIn(false)
     setUser(null)

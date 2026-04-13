@@ -142,3 +142,137 @@
     font-size: 0.92rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   Phone OTP Verification Section
+   ═══════════════════════════════════════════════════ */
+.phone-otp-section {
+  margin-bottom: 14px;
+}
+
+.phone-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.phone-input-row input {
+  flex: 1;
+  margin-bottom: 0 !important;
+}
+
+.phone-input-row input.verified-input {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: #22c55e;
+  color: var(--text-primary);
+}
+
+.otp-send-btn {
+  padding: 12px 18px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration-base) var(--ease-out);
+  box-shadow: 0 3px 10px rgba(252, 128, 25, 0.2);
+}
+
+.otp-send-btn:hover:not(:disabled) {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+}
+
+.otp-send-btn:disabled {
+  background: var(--text-light);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.verified-badge {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  animation: fadeInUp 0.4s var(--ease-out);
+}
+
+.otp-verify-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  animation: fadeInUp 0.4s var(--ease-out);
+}
+
+.otp-input {
+  flex: 1;
+  text-align: center;
+  letter-spacing: 6px;
+  font-size: 1.1rem !important;
+  font-weight: 700;
+  margin-bottom: 0 !important;
+}
+
+.otp-verify-btn {
+  padding: 12px 20px;
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration-base) var(--ease-out);
+  box-shadow: 0 3px 10px rgba(34, 197, 94, 0.2);
+}
+
+.otp-verify-btn:hover:not(:disabled) {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+
+.otp-verify-btn:disabled {
+  background: var(--text-light);
+  cursor: not-allowed;
+}
+
+.otp-message {
+  font-size: 0.82rem;
+  margin-top: 6px;
+  padding-left: 4px;
+  color: var(--accent-dark);
+}
+
+.otp-message.success {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .phone-input-row {
+    flex-wrap: wrap;
+  }
+
+  .phone-input-row input {
+    width: 100%;
+  }
+
+  .otp-send-btn {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .otp-verify-row {
+    flex-wrap: wrap;
+  }
+
+  .otp-input {
+    width: 100%;
+  }
+
+  .otp-verify-btn {
+    width: 100%;
+  }
+}

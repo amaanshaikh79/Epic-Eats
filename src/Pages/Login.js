@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { loginUser, setToken, setStoredUser } from "../utils/api.js"
+import { loginUser, setTokens, setStoredUser } from "../utils/api.js"
 import "../css/Registration.css"
 
 const Login = () => {
@@ -24,8 +24,8 @@ const Login = () => {
     try {
       const data = await loginUser({ email, password })
 
-      // Save token and user data
-      setToken(data.token)
+      // Save both tokens and user data
+      setTokens(data.accessToken, data.refreshToken)
       setStoredUser(data.user)
 
       setEmail("")

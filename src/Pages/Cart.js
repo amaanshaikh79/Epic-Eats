@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { getCart, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartItemCount } from "../utils/cart.js"
-import { createOrder, isLoggedIn, getProfile, getStoredUser } from "../utils/api.js"
+import { createOrder, verifyPayment, isLoggedIn, getProfile, getStoredUser } from "../utils/api.js"
 import "../css/Cart.css"
 
 const Cart = () => {
@@ -46,6 +46,16 @@ const Cart = () => {
         setCartItems(updated)
     }
 
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement("script")
+            script.src = "https://checkout.razorpay.com/v1/checkout.js"
+            script.onload = () => resolve(true)
+            script.onerror = () => resolve(false)
+            document.body.appendChild(script)
+        })
+    }
+
     const handleCheckout = async () => {
         if (!isLoggedIn()) { navigate("/login"); return }
 
@@ -78,12 +88,59 @@ const Cart = () => {
             }
 
             const result = await createOrder(orderData)
-            clearCart()
-            setCartItems([])
-            setOrderId(result.order._id)
+
+            if (paymentMethod === "online" && result.razorpayOrderId) {
+                const res = await loadRazorpay()
+                if (!res) {
+                    setError("Razorpay SDK failed to load. Are you online?")
+                    setLoading(false)
+                    return
+                }
+
+                const options = {
+                    key: result.key,
+                    amount: result.amount,
+                    currency: result.currency,
+                    name: "Epic Eats",
+                    description: "Food Order Payment",
+                    order_id: result.razorpayOrderId,
+                    handler: async function (response) {
+                         try {
+                             await verifyPayment({
+                                 razorpay_order_id: response.razorpay_order_id,
+                                 razorpay_payment_id: response.razorpay_payment_id,
+                                 razorpay_signature: response.razorpay_signature
+                             });
+                             clearCart()
+                             setCartItems([])
+                             setOrderId(result.order._id)
+                         } catch (verifyErr) {
+                             setError(verifyErr.message || "Payment verification failed")
+                         }
+                    },
+                    prefill: {
+                         name: getStoredUser()?.name || "",
+                         email: getStoredUser()?.email || "",
+                         contact: deliveryAddress.phone || ""
+                    },
+                    theme: {
+                         color: "#ff4500"
+                    }
+                }
+                const paymentObject = new window.Razorpay(options)
+                paymentObject.on('payment.failed', function (response) {
+                    setError("Payment failed: " + response.error.description)
+                })
+                paymentObject.open()
+                setLoading(false)
+            } else {
+                clearCart()
+                setCartItems([])
+                setOrderId(result.order._id)
+                setLoading(false)
+            }
         } catch (err) {
             setError(err.message)
-        } finally {
             setLoading(false)
         }
     }

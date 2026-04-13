@@ -5,10 +5,20 @@
 const BASE_URL = process.env.REACT_APP_API_URL || "";
 
 // ──── Token Management ────
-export const getToken = () => localStorage.getItem("epiceats_token");
-export const setToken = (token) => localStorage.setItem("epiceats_token", token);
+export const getToken = () => localStorage.getItem("epiceats_access_token");
+export const getRefreshToken = () => localStorage.getItem("epiceats_refresh_token");
+
+export const setTokens = (accessToken, refreshToken) => {
+    localStorage.setItem("epiceats_access_token", accessToken);
+    localStorage.setItem("epiceats_refresh_token", refreshToken);
+};
+
+// Backward-compatible single-token setter (maps to access token)
+export const setToken = (token) => localStorage.setItem("epiceats_access_token", token);
+
 export const removeToken = () => {
-    localStorage.removeItem("epiceats_token");
+    localStorage.removeItem("epiceats_access_token");
+    localStorage.removeItem("epiceats_refresh_token");
     localStorage.removeItem("epiceats_user");
 };
 
@@ -26,11 +36,98 @@ export const setStoredUser = (user) => {
 };
 
 // ──── Check if user is logged in ────
-export const isLoggedIn = () => !!getToken();
+export const isLoggedIn = () => {
+    // User is considered logged in if we have a valid refresh token
+    // (access token may be expired — it will auto-refresh)
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false;
+    return isTokenValid(refreshToken);
+};
+
+// ──── JWT Token Validation ────
+export const isTokenValid = (token) => {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        // Check if token has expired (exp is in seconds)
+        if (payload.exp && Date.now() >= payload.exp * 1000) {
+            return false;
+        }
+        return true;
+    } catch {
+        return false;
+    }
+};
+
+// ──── Get token expiry time remaining (in ms) ────
+export const getTokenExpiry = () => {
+    const token = getToken();
+    if (!token) return 0;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp ? (payload.exp * 1000) - Date.now() : 0;
+    } catch {
+        return 0;
+    }
+};
+
+// ──── Refresh Access Token ────
+let refreshPromise = null; // Deduplicate concurrent refresh calls
+
+export const refreshAccessToken = async () => {
+    // If a refresh is already in progress, return the same promise
+    if (refreshPromise) return refreshPromise;
+
+    const refreshToken = getRefreshToken();
+    if (!refreshToken || !isTokenValid(refreshToken)) {
+        removeToken();
+        return null;
+    }
+
+    refreshPromise = (async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/api/auth/refresh`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refreshToken }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                removeToken();
+                return null;
+            }
+
+            // Store new tokens
+            setTokens(data.accessToken, data.refreshToken);
+            return data.accessToken;
+        } catch {
+            removeToken();
+            return null;
+        } finally {
+            refreshPromise = null;
+        }
+    })();
+
+    return refreshPromise;
+};
 
 // ──── API Fetch Wrapper ────
-export const apiFetch = async (endpoint, options = {}) => {
-    const token = getToken();
+export const apiFetch = async (endpoint, options = {}, _isRetry = false) => {
+    let token = getToken();
+
+    // If access token is expired but we have a refresh token, refresh first
+    if (token && !isTokenValid(token) && !_isRetry) {
+        token = await refreshAccessToken();
+        if (!token) {
+            // Refresh failed — redirect to login
+            if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/signup')) {
+                window.location.href = '/login';
+            }
+            throw new Error("Session expired. Please login again.");
+        }
+    }
+
     const { headers: customHeaders, ...restOptions } = options;
 
     const config = {
@@ -47,6 +144,19 @@ export const apiFetch = async (endpoint, options = {}) => {
         const data = await response.json();
 
         if (!response.ok) {
+            // On 401, try refreshing the access token and retry ONCE
+            if (response.status === 401 && !_isRetry) {
+                const newToken = await refreshAccessToken();
+                if (newToken) {
+                    // Retry the original request with the new token
+                    return apiFetch(endpoint, options, true);
+                }
+                // Refresh failed — logout
+                removeToken();
+                if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/signup')) {
+                    window.location.href = '/login';
+                }
+            }
             throw new Error(data.message || "Something went wrong");
         }
 
@@ -60,8 +170,13 @@ export const apiFetch = async (endpoint, options = {}) => {
 };
 
 // Special fetch for FormData (image uploads — no Content-Type header)
-export const apiFormFetch = async (endpoint, formData, method = "POST") => {
-    const token = getToken();
+export const apiFormFetch = async (endpoint, formData, method = "POST", _isRetry = false) => {
+    let token = getToken();
+
+    // Pre-refresh if access token is expired
+    if (token && !isTokenValid(token) && !_isRetry) {
+        token = await refreshAccessToken();
+    }
 
     const config = {
         method,
@@ -74,7 +189,19 @@ export const apiFormFetch = async (endpoint, formData, method = "POST") => {
     try {
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Something went wrong");
+
+        if (!response.ok) {
+            // On 401, try refreshing and retry ONCE
+            if (response.status === 401 && !_isRetry) {
+                const newToken = await refreshAccessToken();
+                if (newToken) {
+                    return apiFormFetch(endpoint, formData, method, true);
+                }
+                removeToken();
+            }
+            throw new Error(data.message || "Something went wrong");
+        }
+
         return data;
     } catch (error) {
         if (error.name === "TypeError" && error.message.includes("fetch")) {
@@ -91,7 +218,22 @@ export const registerUser = (userData) =>
 export const loginUser = (credentials) =>
     apiFetch("/api/auth/login", { method: "POST", body: JSON.stringify(credentials) });
 
+export const logoutUser = () =>
+    apiFetch("/api/auth/logout", { method: "POST" });
+
 export const getProfile = () => apiFetch("/api/auth/me");
+
+export const sendOTP = (phone) =>
+    apiFetch("/api/auth/send-otp", { method: "POST", body: JSON.stringify({ phone }) });
+
+export const verifyOTP = (phone, otp) =>
+    apiFetch("/api/auth/verify-otp", { method: "POST", body: JSON.stringify({ phone, otp }) });
+
+export const sendEmailOTP = (email) =>
+    apiFetch("/api/auth/send-email-otp", { method: "POST", body: JSON.stringify({ email }) });
+
+export const verifyEmailOTP = (email, otp) =>
+    apiFetch("/api/auth/verify-email-otp", { method: "POST", body: JSON.stringify({ email, otp }) });
 
 export const updateProfile = (data) =>
     apiFetch("/api/auth/profile", { method: "PUT", body: JSON.stringify(data) });
@@ -121,6 +263,9 @@ export const getMenuItem = (id) => apiFetch(`/api/menu/${id}`);
 // ──── Order API ────
 export const createOrder = (orderData) =>
     apiFetch("/api/orders", { method: "POST", body: JSON.stringify(orderData) });
+
+export const verifyPayment = (paymentData) =>
+    apiFetch("/api/orders/verify", { method: "POST", body: JSON.stringify(paymentData) });
 
 export const getMyOrders = () => apiFetch("/api/orders");
 

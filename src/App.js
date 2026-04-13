@@ -1,22 +1,30 @@
+import React, { lazy, Suspense } from "react"
 import { Routes, Route, useLocation } from "react-router-dom"
 import "./App.css"
 
-import Home from "./Pages/Home.js"
-import Hero from "./Pages/Hero.js"
-import Contact from "./Pages/Contact.js"
-import AboutUs from "./Pages/AboutUs.js"
-import Menu from "./Pages/Menu.js"
+import LoadingSpinner from "./components/LoadingSpinner.js"
+import ProtectedRoute from "./components/ProtectedRoute.js"
+import AdminRoute from "./components/AdminRoute.js"
+
+// ── Eagerly loaded (always needed on every page) ──
 import Navbar from "./Pages/Navbar.js"
 import Footer from "./Pages/Footer.js"
-import Registration from "./Pages/Registration.js"
-import Login from "./Pages/Login.js"
-import Cart from "./Pages/Cart.js"
-import Profile from "./Pages/Profile.js"
-import OrderHistory from "./Pages/OrderHistory.js"
-import OrderConfirmation from "./Pages/OrderConfirmation.js"
-import AdminDashboard from "./Pages/Admin/AdminDashboard.js"
-import AdminProducts from "./Pages/Admin/AdminProducts.js"
-import AdminOrders from "./Pages/Admin/AdminOrders.js"
+
+// ── Lazy-loaded page components ──
+const Home = lazy(() => import("./Pages/Home.js"))
+const Hero = lazy(() => import("./Pages/Hero.js"))
+const Contact = lazy(() => import("./Pages/Contact.js"))
+const AboutUs = lazy(() => import("./Pages/AboutUs.js"))
+const Menu = lazy(() => import("./Pages/Menu.js"))
+const Registration = lazy(() => import("./Pages/Registration.js"))
+const Login = lazy(() => import("./Pages/Login.js"))
+const Cart = lazy(() => import("./Pages/Cart.js"))
+const Profile = lazy(() => import("./Pages/Profile.js"))
+const OrderHistory = lazy(() => import("./Pages/OrderHistory.js"))
+const OrderConfirmation = lazy(() => import("./Pages/OrderConfirmation.js"))
+const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard.js"))
+const AdminProducts = lazy(() => import("./Pages/Admin/AdminProducts.js"))
+const AdminOrders = lazy(() => import("./Pages/Admin/AdminOrders.js"))
 
 const App = () => {
   const location = useLocation();
@@ -26,29 +34,33 @@ const App = () => {
     <div>
       {!isAdminRoute && <Navbar />}
 
-      <Routes>
-        {/* Public */}
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Registration />} />
-        <Route path="/login" element={<Login />} />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          {/* Public */}
+          <Route path="/" element={<Home />} />
+          <Route path="/signup" element={<Registration />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* After Login */}
-        <Route path="/hero" element={<Hero />} />
+          {/* After Login */}
+          <Route path="/hero" element={<Hero />} />
 
-        {/* Other pages */}
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/menu" element={<Menu />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/orders" element={<OrderHistory />} />
-        <Route path="/orders/:id" element={<OrderConfirmation />} />
+          {/* Other public pages */}
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/menu" element={<Menu />} />
 
-        {/* Admin */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-      </Routes>
+          {/* Protected — requires authentication */}
+          <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
+          <Route path="/orders/:id" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
+
+          {/* Admin — requires authentication + admin role */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+          <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+        </Routes>
+      </Suspense>
 
       {!isAdminRoute && <Footer />}
     </div>
