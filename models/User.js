@@ -69,7 +69,15 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
-  addresses: [addressSchema]
+  isPhoneVerified: {
+    type: Boolean,
+    default: false
+  },
+  addresses: [addressSchema],
+  refreshToken: {
+    type: String,
+    select: false
+  }
 }, {
   timestamps: true
 });
