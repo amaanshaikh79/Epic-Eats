@@ -276,3 +276,42 @@ exports.updateOrderStatus = async (req, res, next) => {
         next(error);
     }
 };
+
+// ── User Management ──
+
+// @desc    Get all users (customers)
+// @route   GET /api/admin/users
+exports.getUsers = async (req, res, next) => {
+    try {
+        const { search, page, limit: limitParam } = req.query;
+
+        const filter = { role: 'user' }; // only fetch regular customers
+        if (search) {
+            const regex = new RegExp(search, 'i');
+            filter.$or = [{ fullName: regex }, { email: regex }, { phone: regex }];
+        }
+
+        const pageNum = parseInt(page) || 1;
+        const limit = parseInt(limitParam) || 20;
+        const skip = (pageNum - 1) * limit;
+
+        const [users, total] = await Promise.all([
+            User.find(filter)
+                .select('-password') // explicitly don't fetch password
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            User.countDocuments(filter)
+        ]);
+
+        res.json({
+            success: true,
+            users,
+            total,
+            page: pageNum,
+            pages: Math.ceil(total / limit)
+        });
+    } catch (error) {
+        next(error);
+    }
+};

@@ -6,7 +6,8 @@ const { upload } = require('../middleware/upload');
 const {
     getStats,
     getProducts, createProduct, updateProduct, deleteProduct,
-    getOrders, updateOrderStatus
+    getOrders, updateOrderStatus,
+    getUsers
 } = require('../controllers/adminController');
 
 // All admin routes require auth + admin
@@ -14,6 +15,9 @@ router.use(auth, admin);
 
 // Stats
 router.get('/stats', getStats);
+
+// Users (Customers)
+router.get('/users', getUsers);
 
 // Products
 router.get('/products', getProducts);
