@@ -25,6 +25,7 @@ const OrderConfirmation = lazy(() => import("./Pages/OrderConfirmation.js"))
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard.js"))
 const AdminProducts = lazy(() => import("./Pages/Admin/AdminProducts.js"))
 const AdminOrders = lazy(() => import("./Pages/Admin/AdminOrders.js"))
+const AdminCustomers = lazy(() => import("./Pages/Admin/AdminCustomers.js"))
 
 const App = () => {
   const location = useLocation();
@@ -59,6 +60,7 @@ const App = () => {
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
           <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+          <Route path="/admin/customers" element={<AdminRoute><AdminCustomers /></AdminRoute>} />
         </Routes>
       </Suspense>
 

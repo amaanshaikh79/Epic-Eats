@@ -69,12 +69,10 @@ const Menu = () => {
   if (loading) {
     return (
       <div className="menu-page">
-        <section className="menu-hero">
-          <div className="menu-hero-content">
-            <h1 className="menu-title">Our Menu</h1>
-            <p className="menu-subtitle">Loading delicious dishes...</p>
-          </div>
-        </section>
+        <div className="menu-message-container">
+          <h2>Looking for great food...</h2>
+          <p>Please wait while we fetch the menu for you</p>
+        </div>
       </div>
     )
   }
@@ -82,12 +80,10 @@ const Menu = () => {
   if (error) {
     return (
       <div className="menu-page">
-        <section className="menu-hero">
-          <div className="menu-hero-content">
-            <h1 className="menu-title">Our Menu</h1>
-            <p className="menu-subtitle" style={{ color: "#ff6b6b" }}>{error}</p>
-          </div>
-        </section>
+        <div className="menu-message-container">
+          <h2 style={{ color: "#e43b4f" }}>Oops!</h2>
+          <p>{error}</p>
+        </div>
       </div>
     )
   }
@@ -95,24 +91,17 @@ const Menu = () => {
   return (
     <div className="menu-page">
 
-      {/* Hero Section */}
-      <section className="menu-hero">
-        <div className="menu-hero-content">
-          <h1 className="menu-title">Our Menu</h1>
-          <p className="menu-subtitle">
-            Explore our delicious selection of dishes crafted with love
-          </p>
-
-          {/* Search Bar */}
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search for dishes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <span className="search-icon">🔍</span>
-          </div>
+      {/* Top Search Section */}
+      <section className="swiggy-menu-search">
+        <div className="search-container">
+          <input
+            type="text"
+            className="swiggy-search-input"
+            placeholder="Search for restaurants and food"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <span className="swiggy-search-icon">🔍</span>
         </div>
       </section>
 
@@ -120,59 +109,66 @@ const Menu = () => {
       <section className="menu-content">
         <div className="menu-container">
 
-          {/* Category Tabs */}
-          <div className="category-tabs">
+          {/* Category Tabs (Filter chips) */}
+          <div className="swiggy-filter-chips">
             {categories.map(category => (
-              <button
+              <div
                 key={category}
-                className={`category-tab ${selectedCategory === category ? 'active' : ''}`}
+                className={`swiggy-filter-chip ${selectedCategory === category ? 'active' : ''}`}
                 onClick={() => setSelectedCategory(category)}
               >
-                {category}
-              </button>
+                {category} {selectedCategory === category && <span>✕</span>}
+              </div>
             ))}
           </div>
 
+          <h2 className="swiggy-category-title">{selectedCategory || 'Menu'}</h2>
+
           {/* Menu Items Grid */}
-          <div className="menu-items-grid">
+          <div className="swiggy-restaurant-grid">
             {getFilteredItems().map(item => (
-              <div key={item._id} className={`menu-item-card ${item.stock <= 0 ? 'out-of-stock' : ''}`}>
+              <div key={item._id} className={`swiggy-card ${item.stock <= 0 ? 'out-of-stock' : ''}`}>
 
                 {/* Item Image */}
-                <div className="item-image">
+                <div className="swiggy-card-img-wrapper">
                   <img src={item.image} alt={item.name} loading="lazy" />
-                  <div className="item-badge">
+                  <div className="item-badge-top">
                     {item.isVeg ? (
-                      <span className="veg-badge">🟢 Veg</span>
+                       <span className="veg-badge-swiggy"><span className="veg-dot"></span></span>
                     ) : (
-                      <span className="non-veg-badge">🔴 Non-Veg</span>
+                       <span className="non-veg-badge-swiggy"><span className="non-veg-dot"></span></span>
                     )}
                   </div>
                   {item.stock <= 0 && (
-                    <div className="oos-overlay">Out of Stock</div>
+                     <div className="oos-overlay">Out of Stock</div>
                   )}
+                  {/* Optional Offer text based on price for realism */}
+                  {item.price > 299 && <div className="offer-text">₹50 OFF</div>}
+                  <div className="card-gradient"></div>
                 </div>
 
                 {/* Item Details */}
-                <div className="item-details">
-                  <div className="item-header">
-                    <h3 className="item-name">{item.name}</h3>
-                    <div className="item-rating">
-                      ⭐ {item.rating}
-                    </div>
+                <div className="swiggy-card-content">
+                  <div className="name-and-price">
+                     <h3>{item.name}</h3>
+                     <span className="item-price">₹{item.price}</span>
+                  </div>
+                  <div className="rating-time">
+                    <span className="rating-badge">⭐ {item.rating}</span>
+                    <span className="dot">•</span>
+                    <span className="time">30-35 mins</span>
                   </div>
 
-                  <p className="item-description">{item.description}</p>
-
-                  <div className="item-footer">
-                    <span className="item-price">₹{item.price}<span className="item-unit">/{item.unit}</span></span>
-                    <button
-                      className={`add-btn ${addedItem === item._id ? 'added' : ''}`}
-                      onClick={() => handleAddToCart(item)}
-                      disabled={item.stock <= 0}
-                    >
-                      {item.stock <= 0 ? "Sold Out" : addedItem === item._id ? "✓ Added!" : "Add to Cart"}
-                    </button>
+                  <p className="cuisine-text">{item.description}</p>
+                  
+                  <div className="action-footer">
+                     <button
+                       className={`swiggy-add-btn ${addedItem === item._id ? 'added' : ''}`}
+                       onClick={() => handleAddToCart(item)}
+                       disabled={item.stock <= 0}
+                     >
+                       {item.stock <= 0 ? "SOLD OUT" : addedItem === item._id ? "ADDED" : "ADD"}
+                     </button>
                   </div>
                 </div>
 
@@ -183,8 +179,9 @@ const Menu = () => {
           {/* No Results Message */}
           {getFilteredItems().length === 0 && (
             <div className="no-results">
-              <h3>No items found</h3>
-              <p>Try searching for something else</p>
+              <div className="no-results-img"></div>
+              <h3>No match found for "{searchQuery}"</h3>
+              <p>Please try searching for something else</p>
             </div>
           )}
 
@@ -195,12 +192,14 @@ const Menu = () => {
       {cartCount > 0 && (
         <div className="floating-cart">
           <Link to="/cart" className="cart-button">
-            <span className="cart-icon">🛒</span>
-            <span className="cart-info">
-              <span className="cart-count">{cartCount} items</span>
+            <div className="cart-info">
+              <span className="cart-count">{cartCount} ITEM{cartCount !== 1 ? 'S' : ''}</span>
+              <span className="cart-divider"></span>
               <span className="cart-total">₹{cartTotal}</span>
+            </div>
+            <span className="view-cart">
+              View Cart <span>➔</span>
             </span>
-            <span className="view-cart">View Cart</span>
           </Link>
         </div>
       )}

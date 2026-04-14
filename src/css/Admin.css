@@ -626,6 +626,93 @@
     object-fit: cover;
 }
 
+.order-toggle:hover {
+    color: var(--text-primary);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   Admin Customers Table
+   ═══════════════════════════════════════════════════ */
+.admin-table-container {
+    background: #fff;
+    border-radius: 16px;
+    overflow-x: auto;
+    box-shadow: 0 2px 8px rgba(27, 27, 27, 0.04);
+    border: 1px solid rgba(27, 27, 27, 0.06);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 14px 20px;
+    background: #F5F3F0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid rgba(27, 27, 27, 0.05);
+}
+
+.admin-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(27, 27, 27, 0.05);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.admin-table tbody tr:hover {
+    background: #FEFCFA;
+}
+
+.user-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-sage-dark);
+    color: var(--accent-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    font-family: var(--font-heading);
+}
+
+.admin-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.admin-stats-summary {
+    background: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    border: 1px solid rgba(27, 27, 27, 0.08);
+}
+
+.admin-stats-summary strong {
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    margin-left: 6px;
+}
+
 .td-name {
     color: var(--text-primary);
     font-weight: 600;

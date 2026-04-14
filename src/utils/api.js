@@ -278,6 +278,14 @@ export const submitContact = (formData) =>
 // ──── Admin API ────
 export const adminGetStats = () => apiFetch("/api/admin/stats");
 
+export const adminGetUsers = (params) => {
+    const query = new URLSearchParams();
+    if (params?.search) query.set("search", params.search);
+    if (params?.page) query.set("page", params.page);
+    const qs = query.toString();
+    return apiFetch(`/api/admin/users${qs ? `?${qs}` : ""}`);
+};
+
 export const adminGetProducts = (params) => {
     const query = new URLSearchParams();
     if (params?.search) query.set("search", params.search);
