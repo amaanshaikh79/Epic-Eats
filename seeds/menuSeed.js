@@ -8,41 +8,55 @@ const MenuItem = require('../models/MenuItem');
 const User = require('../models/User');
 
 const menuItems = [
-    // Popular
-    { name: "Butter Chicken", description: "Creamy tomato-based curry with tender chicken pieces", price: 299, image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&q=80", category: "Popular", isVeg: false, rating: 4.8, stock: 50, unit: "plate" },
-    { name: "Paneer Tikka", description: "Grilled cottage cheese marinated in spices", price: 249, image: "https://images.unsplash.com/photo-1631452180539-96aca7d48617?w=400&q=80", category: "Popular", isVeg: true, rating: 4.7, stock: 40, unit: "plate" },
-    { name: "Margherita Pizza", description: "Classic pizza with tomato sauce, mozzarella, and basil", price: 349, image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80", category: "Popular", isVeg: true, rating: 4.6, stock: 30, unit: "piece" },
-    { name: "Chicken Biryani", description: "Fragrant basmati rice with spiced chicken", price: 279, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&q=80", category: "Popular", isVeg: false, rating: 4.9, stock: 60, unit: "plate" },
+    // --- PIZZA ---
+    { name: "Margherita Pizza", description: "Classic cheese pizza with rich tomato sauce and fresh basil.", price: 349, image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=500&q=80", category: "Pizza", isVeg: true, rating: 4.6, stock: 50, unit: "piece" },
+    { name: "Farmhouse Pizza", description: "Loaded with fresh vegetables, mushrooms, peppers, and onions.", price: 449, image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80", category: "Pizza", isVeg: true, rating: 4.8, stock: 40, unit: "piece" },
+    { name: "Pepperoni Pizza", description: "Spicy pepperoni slices topped with premium mozzarella cheese.", price: 599, image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80", category: "Pizza", isVeg: false, rating: 4.9, stock: 35, unit: "piece" },
+    { name: "Chicken Tikka Pizza", description: "Tandoori chicken chunks with spicy jalapeños and red onions.", price: 549, image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80", category: "Pizza", isVeg: false, rating: 4.7, stock: 30, unit: "piece" },
+    { name: "Four Cheese Pizza", description: "A luxurious blend of Mozzarella, Cheddar, Parmesan, and Gouda.", price: 649, image: "https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=500&q=80", category: "Pizza", isVeg: true, rating: 4.5, stock: 20, unit: "piece" },
 
-    // Starters
-    { name: "Spring Rolls", description: "Crispy vegetable rolls with sweet chili sauce", price: 149, image: "https://images.unsplash.com/photo-1620452485617-66ca6fcccc9e?w=400&q=80", category: "Starters", isVeg: true, rating: 4.4, stock: 35, unit: "piece" },
-    { name: "Chicken Wings", description: "Spicy buffalo wings with ranch dip", price: 199, image: "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400&q=80", category: "Starters", isVeg: false, rating: 4.5, stock: 25, unit: "plate" },
-    { name: "Crispy Corn", description: "Golden fried corn kernels with spices", price: 129, image: "https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=400&q=80", category: "Starters", isVeg: true, rating: 4.3, stock: 40, unit: "plate" },
-    { name: "Garlic Bread", description: "Toasted bread with garlic butter and herbs", price: 99, image: "https://images.unsplash.com/photo-1573140401552-3fab0b24306f?w=400&q=80", category: "Starters", isVeg: true, rating: 4.2, stock: 50, unit: "piece" },
+    // --- BURGER ---
+    { name: "Classic Aloo Tikki Burger", description: "Crispy potato patty with fresh lettuce and tangy sauce.", price: 149, image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80", category: "Burger", isVeg: true, rating: 4.5, stock: 60, unit: "piece" },
+    { name: "Double Cheese Burger", description: "Double beef patty with melting cheddar and caramelized onions.", price: 349, image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500&q=80", category: "Burger", isVeg: false, rating: 4.8, stock: 45, unit: "piece" },
+    { name: "Crispy Chicken Burger", description: "Crumb-fried chicken breast with spicy mayo.", price: 299, image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=500&q=80", category: "Burger", isVeg: false, rating: 4.7, stock: 50, unit: "piece" },
+    { name: "Mushroom Swiss Burger", description: "Sautéed mushrooms, melted Swiss cheese, and truffle mayo.", price: 279, image: "https://images.unsplash.com/photo-1594212848116-b8dbbd6ce265?w=500&q=80", category: "Burger", isVeg: true, rating: 4.6, stock: 30, unit: "piece" },
 
-    // Main Course
-    { name: "Dal Makhani", description: "Creamy black lentils slow-cooked with butter", price: 219, image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=80", category: "Main Course", isVeg: true, rating: 4.7, stock: 45, unit: "plate" },
-    { name: "Fish Curry", description: "Fresh fish in tangy coconut curry", price: 329, image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&q=80", category: "Main Course", isVeg: false, rating: 4.6, stock: 20, unit: "plate" },
-    { name: "Palak Paneer", description: "Cottage cheese in creamy spinach gravy", price: 229, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80", category: "Main Course", isVeg: true, rating: 4.5, stock: 35, unit: "plate" },
-    { name: "Mutton Rogan Josh", description: "Aromatic Kashmiri mutton curry", price: 399, image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&q=80", category: "Main Course", isVeg: false, rating: 4.8, stock: 15, unit: "plate" },
+    // --- BIRYANI ---
+    { name: "Hyderabadi Chicken Biryani", description: "Authentic dum biryani with tender chicken and aromatic spices.", price: 349, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80", category: "Biryani", isVeg: false, rating: 4.9, stock: 40, unit: "plate" },
+    { name: "Mutton Dum Biryani", description: "Slow-cooked mutton with saffron rice and fried onions.", price: 499, image: "https://images.unsplash.com/photo-1631452180539-96aca7d48617?w=500&q=80", category: "Biryani", isVeg: false, rating: 4.8, stock: 25, unit: "plate" },
+    { name: "Vegetable Biryani", description: "Mixed seasonal vegetables cooked with basmati rice and mild spices.", price: 249, image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=500&q=80", category: "Biryani", isVeg: true, rating: 4.5, stock: 50, unit: "plate" },
+    { name: "Paneer Biryani", description: "Rich and flavorful biryani featuring soft paneer cubes.", price: 299, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&q=80", category: "Biryani", isVeg: true, rating: 4.6, stock: 35, unit: "plate" },
 
-    // Breads & Rice
-    { name: "Butter Naan", description: "Soft tandoori bread brushed with butter", price: 49, image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=80", category: "Breads & Rice", isVeg: true, rating: 4.6, stock: 100, unit: "piece" },
-    { name: "Jeera Rice", description: "Basmati rice tempered with cumin seeds", price: 129, image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&q=80", category: "Breads & Rice", isVeg: true, rating: 4.4, stock: 60, unit: "plate" },
-    { name: "Garlic Naan", description: "Tandoori bread topped with garlic", price: 59, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80", category: "Breads & Rice", isVeg: true, rating: 4.7, stock: 80, unit: "piece" },
-    { name: "Veg Fried Rice", description: "Wok-tossed rice with vegetables", price: 169, image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&q=80", category: "Breads & Rice", isVeg: true, rating: 4.5, stock: 40, unit: "plate" },
+    // --- NORTH INDIAN ---
+    { name: "Butter Chicken", description: "Creamy tomato-based curry with buttery chicken.", price: 399, image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&q=80", category: "North Indian", isVeg: false, rating: 4.9, stock: 40, unit: "plate" },
+    { name: "Dal Makhani", description: "Overnight slow-cooked black lentils finished with cream.", price: 279, image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&q=80", category: "North Indian", isVeg: true, rating: 4.8, stock: 50, unit: "plate" },
+    { name: "Paneer Butter Masala", description: "Cottage cheese simmered in a mildly spiced tomato gravy.", price: 329, image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", category: "North Indian", isVeg: true, rating: 4.7, stock: 45, unit: "plate" },
+    { name: "Garlic Naan & Mutton Rogan Josh", description: "Classic spicy Kashmiri-style mutton curry with fresh naan.", price: 549, image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80", category: "North Indian", isVeg: false, rating: 4.9, stock: 20, unit: "plate" },
 
-    // Desserts
-    { name: "Gulab Jamun", description: "Soft milk dumplings in rose-flavored syrup", price: 79, image: "https://images.unsplash.com/photo-1589119908995-c6b5de3f3d48?w=400&q=80", category: "Desserts", isVeg: true, rating: 4.8, stock: 50, unit: "piece" },
-    { name: "Chocolate Lava Cake", description: "Warm chocolate cake with molten center", price: 149, image: "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&q=80", category: "Desserts", isVeg: true, rating: 4.9, stock: 20, unit: "piece" },
-    { name: "Ice Cream Sundae", description: "Vanilla ice cream with chocolate sauce and nuts", price: 129, image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80", category: "Desserts", isVeg: true, rating: 4.6, stock: 30, unit: "serving" },
-    { name: "Rasmalai", description: "Soft cheese patties in sweet milk", price: 99, image: "https://images.unsplash.com/photo-1606471191009-63d2e24c422f?w=400&q=80", category: "Desserts", isVeg: true, rating: 4.7, stock: 25, unit: "piece" },
+    // --- CHINESE ---
+    { name: "Hakka Noodles", description: "Wok-tossed noodles with crunchy vegetables.", price: 199, image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=500&q=80", category: "Chinese", isVeg: true, rating: 4.5, stock: 60, unit: "plate" },
+    { name: "Chilli Chicken Dry", description: "Spicy, sweet, and tangy crispy chicken pieces.", price: 299, image: "https://images.unsplash.com/photo-1620452485617-66ca6fcccc9e?w=500&q=80", category: "Chinese", isVeg: false, rating: 4.7, stock: 40, unit: "plate" },
+    { name: "Vegetable Manchurian", description: "Vegetable dumplings in a rich soy-garlic dark sauce.", price: 249, image: "https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=500&q=80", category: "Chinese", isVeg: true, rating: 4.6, stock: 50, unit: "plate" },
+    { name: "Chicken Fried Rice", description: "Fluffy rice wok-tossed with egg and chicken chunks.", price: 259, image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500&q=80", category: "Chinese", isVeg: false, rating: 4.8, stock: 45, unit: "plate" },
+    { name: "Spring Rolls", description: "Crispy rolls filled with shredded Asian vegetables.", price: 189, image: "https://images.unsplash.com/photo-1544025162-811c793740e5?w=500&q=80", category: "Chinese", isVeg: true, rating: 4.4, stock: 55, unit: "plate" },
 
-    // Beverages
-    { name: "Fresh Lime Soda", description: "Refreshing lemon soda with mint", price: 59, image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80", category: "Beverages", isVeg: true, rating: 4.5, stock: 100, unit: "glass" },
-    { name: "Mango Lassi", description: "Sweet yogurt drink with mango pulp", price: 79, image: "https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&q=80", category: "Beverages", isVeg: true, rating: 4.7, stock: 60, unit: "glass" },
-    { name: "Masala Chai", description: "Traditional Indian spiced tea", price: 39, image: "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=400&q=80", category: "Beverages", isVeg: true, rating: 4.6, stock: 200, unit: "glass" },
-    { name: "Cold Coffee", description: "Chilled coffee with ice cream", price: 99, image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80", category: "Beverages", isVeg: true, rating: 4.8, stock: 50, unit: "glass" }
+    // --- SOUTH INDIAN ---
+    { name: "Masala Dosa", description: "Crispy rice crepe filled with spiced potato mash served with chutney & sambar.", price: 169, image: "https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?w=500&q=80", category: "South Indian", isVeg: true, rating: 4.8, stock: 60, unit: "plate" },
+    { name: "Idli Sambar", description: "Steamed rice cakes served with flavorful lentil soup.", price: 129, image: "https://images.unsplash.com/photo-1610192244261-3f339f16d1de?w=500&q=80", category: "South Indian", isVeg: true, rating: 4.7, stock: 70, unit: "plate" },
+    { name: "Medu Vada", description: "Crispy savory donut with coconut chutney.", price: 149, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&q=80", category: "South Indian", isVeg: true, rating: 4.6, stock: 50, unit: "plate" },
+    { name: "Chicken Chettinad", description: "Fiery chicken curry made with roasted spices and coconut.", price: 349, image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80", category: "South Indian", isVeg: false, rating: 4.8, stock: 30, unit: "plate" },
+
+    // --- DESSERTS ---
+    { name: "Chocolate Lava Cake", description: "Decadent warm chocolate cake with a gooey center.", price: 199, image: "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=500&q=80", category: "Desserts", isVeg: true, rating: 4.9, stock: 40, unit: "piece" },
+    { name: "Gulab Jamun", description: "Soft dough dumplings dipped in cardamom sugar syrup.", price: 149, image: "https://images.unsplash.com/photo-1589119908995-c6b5de3f3d48?w=500&q=80", category: "Desserts", isVeg: true, rating: 4.8, stock: 60, unit: "piece" },
+    { name: "Rasmalai", description: "Cottage cheese discs soaked in sweetened saffron milk.", price: 179, image: "https://images.unsplash.com/photo-1606471191009-63d2e24c422f?w=500&q=80", category: "Desserts", isVeg: true, rating: 4.7, stock: 45, unit: "piece" },
+    { name: "New York Cheesecake", description: "Rich and creamy baked vanilla cheesecake.", price: 299, image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500&q=80", category: "Desserts", isVeg: false, rating: 4.8, stock: 25, unit: "piece" },
+
+    // --- ROLLS ---
+    { name: "Chicken Tikka Roll", description: "Spicy chicken tikka wrapped in a flaky paratha.", price: 229, image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80", category: "Rolls", isVeg: false, rating: 4.7, stock: 40, unit: "piece" },
+    { name: "Paneer Kathi Roll", description: "Grilled paneer and onions rolled with mint chutney.", price: 199, image: "https://images.unsplash.com/photo-1555126634-ae231a4a4c11?w=500&q=80", category: "Rolls", isVeg: true, rating: 4.6, stock: 45, unit: "piece" },
+    { name: "Egg Mutton Roll", description: "Double egg wrapper loaded with spicy minced mutton.", price: 289, image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80", category: "Rolls", isVeg: false, rating: 4.8, stock: 30, unit: "piece" },
+    { name: "Veggie Wrap", description: "Fresh healthy vegetables and corn securely wrapped.", price: 149, image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80", category: "Rolls", isVeg: true, rating: 4.3, stock: 50, unit: "piece" }
 ];
 
 const seedDB = async () => {

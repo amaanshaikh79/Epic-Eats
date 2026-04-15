@@ -23,7 +23,7 @@ const menuItemSchema = new mongoose.Schema({
     category: {
         type: String,
         required: [true, 'Category is required'],
-        enum: ['Popular', 'Starters', 'Main Course', 'Breads & Rice', 'Desserts', 'Beverages', 'Fruits', 'Vegetables', 'Dairy', 'Snacks']
+        enum: ['Pizza', 'Burger', 'Biryani', 'North Indian', 'Chinese', 'South Indian', 'Desserts', 'Rolls', 'Popular', 'Starters', 'Main Course', 'Breads & Rice', 'Beverages', 'Fruits', 'Vegetables', 'Dairy', 'Snacks']
     },
     isVeg: {
         type: Boolean,
