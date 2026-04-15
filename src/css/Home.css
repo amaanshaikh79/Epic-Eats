@@ -90,6 +90,50 @@
   white-space: nowrap;
 }
 
+.location-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  padding: 8px 0;
+  z-index: 100;
+  border: 1px solid #e2e2e7;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.location-dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #282c3f;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.location-dropdown-item:hover {
+  background: #f0f0f5;
+  color: #fc8019;
+}
+
+.dropdown-icon {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.no-match {
+  color: #686b78;
+  cursor: default;
+}
+.no-match:hover {
+  background: transparent;
+  color: #686b78;
+}
+
 .search-input-wrapper {
   display: flex;
   align-items: center;

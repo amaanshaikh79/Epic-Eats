@@ -162,9 +162,21 @@
 /* ── Product Card ── */
 .swiggy-card {
   cursor: pointer;
-  transition: transform 0.15s ease-in-out;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   display: flex;
   flex-direction: column;
+  animation: fadeInPop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fadeInPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .swiggy-card:hover {
@@ -474,6 +486,62 @@
   font-size: 15px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   Skeleton Loading States
+   ═══════════════════════════════════════════════════ */
+
+.skeleton-card {
+  pointer-events: none;
+}
+
+.sk-img {
+  background: linear-gradient(110deg, #e8e8e8 8%, #f5f5f5 18%, #e8e8e8 33%);
+  background-size: 200% 100%;
+  animation: skShimmer 1.5s infinite linear;
+}
+
+.sk-text {
+  background: linear-gradient(110deg, #e8e8e8 8%, #f5f5f5 18%, #e8e8e8 33%);
+  background-size: 200% 100%;
+  animation: skShimmer 1.5s infinite linear;
+  border-radius: 4px;
+}
+
+.sk-search-bar {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(110deg, #e8e8e8 8%, #f5f5f5 18%, #e8e8e8 33%);
+  background-size: 200% 100%;
+  animation: skShimmer 1.5s infinite linear;
+}
+
+.sk-chip {
+  width: 90px;
+  height: 36px;
+  background: linear-gradient(110deg, #e8e8e8 8%, #f5f5f5 18%, #e8e8e8 33%) !important;
+  background-size: 200% 100% !important;
+  animation: skShimmer 1.5s infinite linear !important;
+  border-color: transparent !important;
+  color: transparent !important;
+}
+
+.sk-title-bar {
+  width: 180px;
+  height: 28px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  background: linear-gradient(110deg, #e8e8e8 8%, #f5f5f5 18%, #e8e8e8 33%);
+  background-size: 200% 100%;
+  animation: skShimmer 1.5s infinite linear;
+}
+
+@keyframes skShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 

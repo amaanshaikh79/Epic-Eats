@@ -37,6 +37,49 @@
   padding: 12px 6%;
 }
 
+/* ── Logo & Location Container ── */
+.nav-brand-container {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.nav-location-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: var(--radius-md);
+  transition: background var(--duration-base) var(--ease-out);
+}
+
+.nav-location-selector:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.nav-loc-type {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+.nav-loc-text {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.nav-loc-arrow {
+  color: var(--accent);
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
 /* ── Logo ── */
 .nav-logo {
   font-family: var(--font-heading);
@@ -364,5 +407,9 @@
 
   .nav-logo {
     font-size: 20px;
+  }
+
+  .nav-location-selector {
+    display: none;
   }
 }

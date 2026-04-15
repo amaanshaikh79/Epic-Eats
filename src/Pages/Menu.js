@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { getMenuItems } from "../utils/api.js"
 import { addToCart as addItemToCart, getCart, getCartTotal, getCartItemCount } from "../utils/cart.js"
 import "../css/Menu.css"
 
+// Exact display order for category tabs
+const CATEGORY_ORDER = ['Pizza', 'Burger', 'Biryani', 'North Indian', 'Chinese', 'South Indian', 'Desserts', 'Rolls']
+
 const Menu = () => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const initialCategory = queryParams.get("category")
+
   const [menuData, setMenuData] = useState({})
-  const [selectedCategory, setSelectedCategory] = useState("Popular")
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "Pizza")
   const [cartCount, setCartCount] = useState(0)
   const [cartTotal, setCartTotal] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
@@ -36,7 +43,11 @@ const Menu = () => {
     setCartTotal(getCartTotal())
   }, [])
 
-  const categories = Object.keys(menuData)
+  // Use the predefined order, only showing categories that exist in API data
+  const categories = CATEGORY_ORDER.filter(cat => menuData[cat])
+  // Also append any extra API categories not in CATEGORY_ORDER
+  const extraCategories = Object.keys(menuData).filter(cat => !CATEGORY_ORDER.includes(cat))
+  const allCategories = [...categories, ...extraCategories]
 
   // Filter items based on search query
   const getFilteredItems = () => {
@@ -61,18 +72,55 @@ const Menu = () => {
 
   // Set first available category once data loads
   useEffect(() => {
-    if (categories.length > 0 && !categories.includes(selectedCategory)) {
-      setSelectedCategory(categories[0])
+    if (allCategories.length > 0) {
+      // Find case-insensitive match for selectedCategory, useful if from URL
+      const match = allCategories.find(c => c.toLowerCase() === selectedCategory.toLowerCase())
+      
+      if (match && match !== selectedCategory) {
+        setSelectedCategory(match)
+      } else if (!match && !allCategories.includes(selectedCategory)) {
+        setSelectedCategory(allCategories[0])
+      }
     }
-  }, [categories, selectedCategory])
+  }, [allCategories, selectedCategory])
 
   if (loading) {
     return (
       <div className="menu-page">
-        <div className="menu-message-container">
-          <h2>Looking for great food...</h2>
-          <p>Please wait while we fetch the menu for you</p>
-        </div>
+        {/* Skeleton Search Bar */}
+        <section className="swiggy-menu-search">
+          <div className="search-container">
+            <div className="sk-search-bar"></div>
+          </div>
+        </section>
+
+        <section className="menu-content">
+          <div className="menu-container">
+            {/* Skeleton Filter Chips */}
+            <div className="swiggy-filter-chips">
+              {CATEGORY_ORDER.map((cat, i) => (
+                <div key={i} className="swiggy-filter-chip sk-chip"></div>
+              ))}
+            </div>
+
+            <div className="sk-title-bar"></div>
+
+            {/* Skeleton Cards Grid */}
+            <div className="swiggy-restaurant-grid">
+              {Array(8).fill(0).map((_, i) => (
+                <div className="swiggy-card skeleton-card" key={`sk-${i}`}>
+                  <div className="swiggy-card-img-wrapper sk-img"></div>
+                  <div className="swiggy-card-content">
+                    <div className="sk-text" style={{ width: '75%', height: '18px' }}></div>
+                    <div className="sk-text" style={{ width: '50%', height: '14px', marginTop: '10px' }}></div>
+                    <div className="sk-text" style={{ width: '90%', height: '12px', marginTop: '10px' }}></div>
+                    <div className="sk-text" style={{ width: '60px', height: '32px', marginTop: '14px', borderRadius: '8px' }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     )
   }
@@ -111,7 +159,7 @@ const Menu = () => {
 
           {/* Category Tabs (Filter chips) */}
           <div className="swiggy-filter-chips">
-            {categories.map(category => (
+            {allCategories.map(category => (
               <div
                 key={category}
                 className={`swiggy-filter-chip ${selectedCategory === category ? 'active' : ''}`}

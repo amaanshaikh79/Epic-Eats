@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { LocationContext } from "../context/LocationContext.js"
 import { getMenuItems } from "../utils/api.js"
 import "../css/Home.css"
 
@@ -7,6 +8,65 @@ const Home = () => {
   const navigate = useNavigate()
   const [menuItems, setMenuItems] = useState([])
   const [loading, setLoading] = useState(true)
+
+  const { location: currentLoc, updateLocation } = useContext(LocationContext)
+  const [locationQuery, setLocationQuery] = useState("")
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [locating, setLocating] = useState(false)
+  const dropdownRef = useRef(null)
+
+  const indianCities = [
+    "New Delhi, India", "Mumbai, India", "Bengaluru, India", 
+    "Hyderabad, India", "Chennai, India", "Kolkata, India", 
+    "Pune, India", "Ahmedabad, India", "Jaipur, India"
+  ]
+
+  // Hide dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const handleLocationSelect = (city) => {
+    updateLocation(city)
+    setLocationQuery("")
+    setShowDropdown(false)
+  }
+
+  const handleLocateMe = () => {
+    if ("geolocation" in navigator) {
+      setLocating(true)
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await response.json();
+            
+            const city = data.address.city || data.address.town || data.address.state_district || "Unknown Location";
+            updateLocation(`${city}, India`);
+          } catch (error) {
+            console.error("Geocoding failed", error);
+            alert("Could not fetch location name. Please select manually.");
+          } finally {
+            setLocating(false)
+          }
+        },
+        (error) => {
+          console.error("Geolocation error", error);
+          alert("Location access denied or unavailable.");
+          setLocating(false)
+        }
+      )
+    } else {
+      alert("Geolocation is not supported by your browser.")
+    }
+  }
 
   // Categories data with food images Unsplash
   const categories = [
@@ -52,10 +112,41 @@ const Home = () => {
               Order food & groceries. Discover <br /> best restaurants. EPIC EATS it!
             </h1>
             <div className="swiggy-search-box">
-              <div className="location-input-wrapper">
+              <div className="location-input-wrapper" ref={dropdownRef}>
                 <span className="location-icon">📍</span>
-                <input type="text" placeholder="Enter your delivery location" className="location-input" />
-                <span className="locate-me">Locate Me</span>
+                <input 
+                  type="text" 
+                  placeholder={currentLoc || "Enter your delivery location"} 
+                  className="location-input" 
+                  value={locationQuery}
+                  onChange={(e) => {
+                    setLocationQuery(e.target.value);
+                    setShowDropdown(true);
+                  }}
+                  onFocus={() => setShowDropdown(true)}
+                />
+                <span className="locate-me" onClick={handleLocateMe}>
+                  {locating ? "Locating..." : "Locate Me"}
+                </span>
+                
+                {showDropdown && (
+                  <div className="location-dropdown">
+                    {indianCities
+                      .filter(city => city.toLowerCase().includes(locationQuery.toLowerCase()))
+                      .map((city, idx) => (
+                        <div 
+                          key={idx} 
+                          className="location-dropdown-item"
+                          onClick={() => handleLocationSelect(city)}
+                        >
+                          <span className="dropdown-icon">📍</span> {city}
+                        </div>
+                    ))}
+                    {indianCities.filter(c => c.toLowerCase().includes(locationQuery.toLowerCase())).length === 0 && (
+                        <div className="location-dropdown-item no-match">No matching cities found</div>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="search-input-wrapper" onClick={() => navigate('/menu')}>
                 <input type="text" placeholder="Search for restaurant, item or more" readOnly />
@@ -77,9 +168,9 @@ const Home = () => {
           </div>
           <div className="category-carousel">
             {categories.map((cat, idx) => (
-              <div className="mind-category-item" key={idx} onClick={() => navigate('/menu')}>
+              <div className="mind-category-item" key={idx} onClick={() => navigate(`/menu?category=${cat.name}`)}>
                 <div className="circular-img-wrapper">
-                  <img src={cat.image} alt={cat.name} />
+                  <img src={cat.image} alt={cat.name} loading="lazy" />
                 </div>
                 <p>{cat.name}</p>
               </div>
@@ -97,9 +188,9 @@ const Home = () => {
           </div>
           <div className="restaurant-carousel">
              {!loading && menuItems.slice(0, 4).map((item) => (
-               <div className="swiggy-card" key={`featured-${item._id}`} onClick={() => navigate('/menu')}>
+               <div className="swiggy-card" key={`featured-${item._id}`} onClick={() => navigate(`/menu?category=${item.category}`)}>
                   <div className="swiggy-card-img-wrapper">
-                     <img src={item.image} alt={item.name} />
+                     <img src={item.image} alt={item.name} loading="lazy" />
                      <div className="card-gradient"></div>
                      <div className="offer-text">₹100 OFF ABOVE ₹299</div>
                   </div>
@@ -146,9 +237,9 @@ const Home = () => {
 
           <div className="restaurant-grid">
              {!loading && menuItems.map((item) => (
-                <div className="swiggy-card" key={item._id} onClick={() => navigate('/menu')}>
+                <div className="swiggy-card" key={item._id} onClick={() => navigate(`/menu?category=${item.category}`)}>
                   <div className="swiggy-card-img-wrapper">
-                     <img src={item.image} alt={item.name} />
+                     <img src={item.image} alt={item.name} loading="lazy" />
                      <div className="card-gradient"></div>
                      <div className="offer-text">ITEMS AT ₹129</div>
                   </div>

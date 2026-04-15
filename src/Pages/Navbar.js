@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
+import { LocationContext } from "../context/LocationContext.js"
 import { isLoggedIn, removeToken, getStoredUser, logoutUser } from "../utils/api.js"
 import { getCartItemCount } from "../utils/cart.js"
 import "../css/Navbar.css"
@@ -10,6 +11,7 @@ const Navbar = () => {
   const [user, setUser] = useState(null)
   const [cartCount, setCartCount] = useState(0)
   const [scrolled, setScrolled] = useState(false)
+  const { location: appLocation } = useContext(LocationContext)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -51,9 +53,16 @@ const Navbar = () => {
     <nav className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}>
       <div className="nav-container">
 
-        <Link to="/" className="nav-logo" onClick={closeMenu}>
-          EPIC EATS
-        </Link>
+        <div className="nav-brand-container">
+          <Link to="/" className="nav-logo" onClick={closeMenu}>
+            EPIC EATS
+          </Link>
+          <div className="nav-location-selector">
+            <span className="nav-loc-type">Other</span>
+            <span className="nav-loc-text">{appLocation}</span>
+            <span className="nav-loc-arrow">▼</span>
+          </div>
+        </div>
 
         <div className="menu-icon" onClick={toggleMenu}>
           <div className={menuOpen ? "hamburger open" : "hamburger"}>
