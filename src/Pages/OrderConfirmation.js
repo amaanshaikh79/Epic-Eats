@@ -88,7 +88,8 @@ const OrderConfirmation = () => {
                 )}
 
                 <div className="confirm-actions">
-                    <button className="primary-btn" onClick={() => navigate("/menu")}>Order More</button>
+                    <button className="primary-btn" onClick={() => navigate(`/orders/${order._id}/invoice`)}>📄 View Invoice</button>
+                    <button className="secondary-btn" onClick={() => navigate("/menu")}>Order More</button>
                     <button className="secondary-btn" onClick={() => navigate("/orders")}>View All Orders</button>
                 </div>
             </div>

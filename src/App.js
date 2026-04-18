@@ -22,6 +22,7 @@ const Cart = lazy(() => import("./Pages/Cart.js"))
 const Profile = lazy(() => import("./Pages/Profile.js"))
 const OrderHistory = lazy(() => import("./Pages/OrderHistory.js"))
 const OrderConfirmation = lazy(() => import("./Pages/OrderConfirmation.js"))
+const Invoice = lazy(() => import("./Pages/Invoice.js"))
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard.js"))
 const AdminProducts = lazy(() => import("./Pages/Admin/AdminProducts.js"))
 const AdminOrders = lazy(() => import("./Pages/Admin/AdminOrders.js"))
@@ -55,6 +56,7 @@ const App = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
           <Route path="/orders/:id" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
+          <Route path="/orders/:id/invoice" element={<ProtectedRoute><Invoice /></ProtectedRoute>} />
 
           {/* Admin — requires authentication + admin role */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

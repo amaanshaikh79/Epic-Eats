@@ -121,6 +121,12 @@ const OrderHistory = () => {
                                                 }</p>
                                             </div>
                                         )}
+                                        <button
+                                            className="invoice-link-btn"
+                                            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}/invoice`) }}
+                                        >
+                                            📄 View Invoice
+                                        </button>
                                     </div>
                                 )}
                             </div>

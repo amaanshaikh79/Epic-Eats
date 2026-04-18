@@ -154,7 +154,10 @@ const Cart = () => {
                     <h2>Order Placed Successfully!</h2>
                     <p>Your delicious food is being prepared and will be delivered soon.</p>
                     <div className="success-actions">
-                        <button onClick={() => navigate(`/orders/${orderId}`)} className="continue-btn">
+                        <button onClick={() => navigate(`/orders/${orderId}/invoice`)} className="continue-btn">
+                            📄 View Invoice
+                        </button>
+                        <button onClick={() => navigate(`/orders/${orderId}`)} className="home-btn">
                             View Order
                         </button>
                         <button onClick={() => navigate("/menu")} className="home-btn">

@@ -85,7 +85,7 @@
   font-family: var(--font-heading);
   font-size: 26px;
   font-weight: 700;
-  color: var(--accent-dark);
+  color: var(--text-primary);
   text-decoration: none;
   letter-spacing: 0.02em;
   transition: all var(--duration-base) var(--ease-out);

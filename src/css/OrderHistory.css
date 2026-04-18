@@ -273,6 +273,30 @@
     line-height: 1.5;
 }
 
+/* ── Invoice Button ── */
+.invoice-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 10px 22px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-base) var(--ease-out);
+    box-shadow: 0 4px 14px rgba(252, 128, 25, 0.25);
+}
+
+.invoice-link-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(252, 128, 25, 0.35);
+}
+
 /* ── No Orders ── */
 .no-orders {
     text-align: center;

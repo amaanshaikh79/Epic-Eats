@@ -271,6 +271,8 @@ export const getMyOrders = () => apiFetch("/api/orders");
 
 export const getOrder = (id) => apiFetch(`/api/orders/${id}`);
 
+export const getInvoice = (id) => apiFetch(`/api/orders/${id}/invoice`);
+
 // ──── Contact API ────
 export const submitContact = (formData) =>
     apiFetch("/api/contact", { method: "POST", body: JSON.stringify(formData) });
