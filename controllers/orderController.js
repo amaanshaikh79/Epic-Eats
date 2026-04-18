@@ -206,3 +206,37 @@ exports.getOrder = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Get invoice for a confirmed/paid order
+// @route   GET /api/orders/:id/invoice
+exports.getInvoice = async (req, res, next) => {
+    try {
+        const order = await Order.findOne({
+            _id: req.params.id,
+            user: req.user.id
+        }).lean();
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Fetch user details for the invoice (only safe fields)
+        const user = await User.findById(req.user.id).select('fullName email phone');
+
+        const invoice = {
+            ...order,
+            user: user ? {
+                fullName: user.fullName,
+                email: user.email,
+                phone: user.phone
+            } : null
+        };
+
+        res.json({ success: true, invoice });
+    } catch (error) {
+        next(error);
+    }
+};
