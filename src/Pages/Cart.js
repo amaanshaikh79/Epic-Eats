@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { getCart, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartItemCount } from "../utils/cart.js"
 import { createOrder, verifyPayment, isLoggedIn, getProfile, getStoredUser } from "../utils/api.js"
+import FoodImage from "../components/FoodImage.js"
 import "../css/Cart.css"
 
 const Cart = () => {
@@ -206,7 +207,7 @@ const Cart = () => {
                         {cartItems.map((item) => (
                             <div key={item._id} className="cart-item">
                                 <div className="cart-item-image">
-                                    <img src={item.image} alt={item.name} loading="lazy" />
+                                    <FoodImage src={item.image} alt={item.name} category={item.category} />
                                 </div>
                                 <div className="cart-item-details">
                                     <h3>{item.name}</h3>

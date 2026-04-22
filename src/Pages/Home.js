@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { LocationContext } from "../context/LocationContext.js"
 import { getMenuItems } from "../utils/api.js"
+import FoodImage from "../components/FoodImage.js"
 import "../css/Home.css"
 
 const Home = () => {
@@ -71,11 +72,11 @@ const Home = () => {
   // Categories data with food images Unsplash
   const categories = [
     { name: "Pizza", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=150&q=80" },
-    { name: "Burgers", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=150&q=80" },
+    { name: "Burger", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=150&q=80" },
     { name: "Biryani", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=150&q=80" },
     { name: "North Indian", image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=150&q=80" },
     { name: "Chinese", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=150&q=80" },
-    { name: "South Indian", image: "https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?auto=format&fit=crop&w=150&q=80" },
+    { name: "South Indian", image: "https://images.unsplash.com/photo-1630383249896-424e482df921?auto=format&fit=crop&w=150&q=80" },
     { name: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=150&q=80" },
     { name: "Rolls", image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=150&q=80" },
   ]
@@ -190,7 +191,7 @@ const Home = () => {
              {!loading && menuItems.slice(0, 4).map((item) => (
                <div className="swiggy-card" key={`featured-${item._id}`} onClick={() => navigate(`/menu?category=${item.category}`)}>
                   <div className="swiggy-card-img-wrapper">
-                     <img src={item.image} alt={item.name} loading="lazy" />
+                     <FoodImage src={item.image} alt={item.name} category={item.category} />
                      <div className="card-gradient"></div>
                      <div className="offer-text">₹100 OFF ABOVE ₹299</div>
                   </div>
@@ -239,7 +240,7 @@ const Home = () => {
              {!loading && menuItems.map((item) => (
                 <div className="swiggy-card" key={item._id} onClick={() => navigate(`/menu?category=${item.category}`)}>
                   <div className="swiggy-card-img-wrapper">
-                     <img src={item.image} alt={item.name} loading="lazy" />
+                     <FoodImage src={item.image} alt={item.name} category={item.category} />
                      <div className="card-gradient"></div>
                      <div className="offer-text">ITEMS AT ₹129</div>
                   </div>

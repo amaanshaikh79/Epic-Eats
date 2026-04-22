@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { getMenuItems } from "../utils/api.js"
 import { addToCart as addItemToCart, getCart, getCartTotal, getCartItemCount } from "../utils/cart.js"
+import FoodImage from "../components/FoodImage.js"
 import "../css/Menu.css"
 
 // Exact display order for category tabs
@@ -179,7 +180,7 @@ const Menu = () => {
 
                 {/* Item Image */}
                 <div className="swiggy-card-img-wrapper">
-                  <img src={item.image} alt={item.name} loading="lazy" />
+                  <FoodImage src={item.image} alt={item.name} category={item.category} />
                   <div className="item-badge-top">
                     {item.isVeg ? (
                        <span className="veg-badge-swiggy"><span className="veg-dot"></span></span>
