@@ -83,6 +83,17 @@ const verifyOTP = (phone, otp) => {
     return { success: true, message: 'Phone number verified successfully' };
 };
 
+// Regions not supported on Twilio trial (add/remove as needed)
+const UNSUPPORTED_SMS_PREFIXES = ['+91'];
+
+/**
+ * Check if SMS can be sent to this number
+ */
+const canSendSMS = (phone) => {
+    if (!phone) return false;
+    return !UNSUPPORTED_SMS_PREFIXES.some(prefix => phone.startsWith(prefix));
+};
+
 /**
  * Send order confirmation SMS
  * @param {string} phone - Customer's phone number
@@ -90,6 +101,11 @@ const verifyOTP = (phone, otp) => {
  */
 const sendOrderConfirmation = async (phone, order) => {
     try {
+        if (!canSendSMS(phone)) {
+            console.log(`📱 SMS skipped for ${phone.slice(0, 6)}XXXX (region not enabled on Twilio)`);
+            return;
+        }
+
         const itemsList = order.items
             .map(item => `${item.name} x${item.quantity}`)
             .join(', ');

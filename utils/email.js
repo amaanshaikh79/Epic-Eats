@@ -291,9 +291,217 @@ const sendOrderEmail = async (email, order) => {
     }
 };
 
+/**
+ * Send Tracking Link Email to Customer when delivery partner is assigned
+ */
+const sendTrackingEmail = async (email, order, partner, trackingLink) => {
+    try {
+        const itemsList = order.items.map(item =>
+            `<tr>
+                <td>${item.name}</td>
+                <td style="text-align: center;">${item.quantity}</td>
+                <td style="text-align: right;">₹${item.price * item.quantity}</td>
+            </tr>`
+        ).join('');
+
+        const addr = order.deliveryAddress;
+        const addressStr = addr
+            ? `${addr.street}, ${addr.city}, ${addr.state} — ${addr.pinCode}`
+            : 'N/A';
+
+        const html = `
+        <!DOCTYPE html>
+        <html><head><style>${brandStyles}</style></head>
+        <body>
+            <div class="email-wrapper">
+                <div class="header">
+                    <h1>🍔 EPIC EATS</h1>
+                    <p>Your Order is On Its Way! 🚀</p>
+                </div>
+                <div class="body">
+                    <h2>Great News! 🎉</h2>
+                    <p>Your order <strong>#${order._id.toString().slice(-8).toUpperCase()}</strong> has been assigned to a delivery partner and is on its way!</p>
+
+                    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 14px; padding: 20px; margin: 20px 0;">
+                        <h3 style="margin: 0 0 12px; color: #166534; font-size: 15px;">🏍️ Your Delivery Partner</h3>
+                        <table style="width: 100%; font-size: 14px;">
+                            <tr>
+                                <td style="color: #888; padding: 4px 0;">Name</td>
+                                <td style="text-align: right; font-weight: 600; color: #1a1a1a;">${partner.name}</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #888; padding: 4px 0;">Phone</td>
+                                <td style="text-align: right; font-weight: 600; color: #1a1a1a;">📞 ${partner.phone}</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #888; padding: 4px 0;">Vehicle</td>
+                                <td style="text-align: right; font-weight: 600; color: #1a1a1a;">${partner.vehicleType.charAt(0).toUpperCase() + partner.vehicleType.slice(1)} ${partner.vehicleNumber ? '(' + partner.vehicleNumber + ')' : ''}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="font-size: 16px; color: #1a1a1a; margin-bottom: 8px;">🧾 Order Summary</h3>
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsList}
+                            <tr class="total-row">
+                                <td colspan="2" style="text-align: right;">Grand Total</td>
+                                <td style="text-align: right; color: #ff6b00;">₹${order.totalAmount}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="font-size: 16px; color: #1a1a1a; margin: 24px 0 8px;">📍 Delivering To</h3>
+                    <div class="address-box">${addressStr}</div>
+
+                    <div class="divider"></div>
+
+                    <div style="text-align: center; margin: 24px 0;">
+                        <p style="font-size: 15px; color: #555; margin-bottom: 12px;">Track your delivery in real-time:</p>
+                        <a href="${trackingLink}" class="btn" style="font-size: 16px; padding: 16px 40px;">📍 Track My Order Live</a>
+                    </div>
+
+                    <div class="divider"></div>
+                    <p style="text-align: center; color: #888; font-size: 13px;">Need help? Reply to this email or contact us at <a href="mailto:supportepiceats@gmail.com" style="color: #ff6b00;">supportepiceats@gmail.com</a></p>
+                </div>
+                <div class="footer">
+                    <p>© ${new Date().getFullYear()} Epic Eats. All rights reserved.</p>
+                    <p>Delivering happiness, one meal at a time 🚀</p>
+                </div>
+            </div>
+        </body></html>`;
+
+        await transporter.sendMail({
+            from: `"Epic Eats" <${process.env.SMTP_EMAIL}>`,
+            to: email,
+            subject: `🚀 Epic Eats — Your Order #${order._id.toString().slice(-8).toUpperCase()} is On the Way!`,
+            html
+        });
+
+        console.log(`📧 Tracking email sent to ${email}`);
+    } catch (error) {
+        console.error('Tracking email failed:', error.message);
+    }
+};
+
+/**
+ * Send Delivery Assignment Email to Delivery Partner
+ */
+const sendDeliveryAssignmentEmail = async (partner, order) => {
+    try {
+        const itemsList = order.items.map(item =>
+            `<tr>
+                <td>${item.name}</td>
+                <td style="text-align: center;">×${item.quantity}</td>
+            </tr>`
+        ).join('');
+
+        const addr = order.deliveryAddress;
+        const addressStr = addr
+            ? `${addr.street}, ${addr.city}, ${addr.state} — ${addr.pinCode}<br/>📞 ${addr.phone}`
+            : 'N/A';
+
+        const customerName = order.user?.fullName || 'Customer';
+        const customerPhone = order.deliveryAddress?.phone || 'N/A';
+
+        const html = `
+        <!DOCTYPE html>
+        <html><head><style>${brandStyles}</style></head>
+        <body>
+            <div class="email-wrapper">
+                <div class="header" style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);">
+                    <h1>🏍️ EPIC EATS — DELIVERY</h1>
+                    <p>New Order Assignment</p>
+                </div>
+                <div class="body">
+                    <h2>Hey ${partner.name}! 👋</h2>
+                    <p>You have been assigned a new delivery order. Please pick it up as soon as possible.</p>
+
+                    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 14px; padding: 20px; margin: 20px 0;">
+                        <h3 style="margin: 0 0 12px; color: #92400e; font-size: 15px;">📋 Order Details</h3>
+                        <table style="width: 100%; font-size: 14px;">
+                            <tr>
+                                <td style="color: #92400e; padding: 4px 0;">Order ID</td>
+                                <td style="text-align: right; font-weight: 700; color: #1a1a1a;">#${order._id.toString().slice(-8).toUpperCase()}</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #92400e; padding: 4px 0;">Total Amount</td>
+                                <td style="text-align: right; font-weight: 700; color: #ff6b00;">₹${order.totalAmount}</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #92400e; padding: 4px 0;">Payment</td>
+                                <td style="text-align: right; font-weight: 600;">${order.paymentMethod === 'cod' ? '💵 Cash on Delivery' : '💳 Paid Online'}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="font-size: 16px; color: #1a1a1a; margin-bottom: 8px;">🧾 Items to Pick Up</h3>
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th style="text-align: center;">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>${itemsList}</tbody>
+                    </table>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0;">
+                        <div style="background: #eff6ff; border-radius: 12px; padding: 16px;">
+                            <h4 style="font-size: 13px; color: #1d4ed8; margin-bottom: 8px;">🏪 PICKUP</h4>
+                            <p style="font-size: 14px; color: #333; margin: 0;">Epic Eats Kitchen<br/>Main Branch</p>
+                        </div>
+                        <div style="background: #fef2f2; border-radius: 12px; padding: 16px;">
+                            <h4 style="font-size: 13px; color: #dc2626; margin-bottom: 8px;">📍 DROP</h4>
+                            <p style="font-size: 14px; color: #333; margin: 0;">${addressStr}</p>
+                        </div>
+                    </div>
+
+                    <div class="address-box">
+                        <strong>👤 Customer:</strong> ${customerName}<br/>
+                        <strong>📞 Contact:</strong> ${customerPhone}
+                    </div>
+
+                    <div style="text-align: center; margin: 24px 0;">
+                        <p style="font-size: 15px; color: #555; margin-bottom: 12px;">Start your delivery and share your live location:</p>
+                        <a href="${process.env.FRONTEND_URL}/delivery/share-location/${partner._id}" class="btn" style="background: linear-gradient(135deg, #FC8019 0%, #ff6b00 100%); font-size: 16px; padding: 16px 40px; display: inline-block;">▶ Start Sharing Location</a>
+                    </div>
+
+                    <div class="divider"></div>
+                    <p style="text-align: center; color: #888; font-size: 13px;">Please ensure timely delivery. Contact support if needed.</p>
+                </div>
+                <div class="footer">
+                    <p>© ${new Date().getFullYear()} Epic Eats Delivery Team</p>
+                    <p>🏍️ Ride safe, deliver with a smile!</p>
+                </div>
+            </div>
+        </body></html>`;
+
+        await transporter.sendMail({
+            from: `"Epic Eats Delivery" <${process.env.SMTP_EMAIL}>`,
+            to: partner.email,
+            subject: `🏍️ New Delivery Assignment — Order #${order._id.toString().slice(-8).toUpperCase()}`,
+            html
+        });
+
+        console.log(`📧 Delivery assignment email sent to ${partner.email}`);
+    } catch (error) {
+        console.error('Delivery assignment email failed:', error.message);
+    }
+};
+
 module.exports = {
     sendEmailOTP,
     verifyEmailOTP,
     sendWelcomeEmail,
-    sendOrderEmail
+    sendOrderEmail,
+    sendTrackingEmail,
+    sendDeliveryAssignmentEmail
 };

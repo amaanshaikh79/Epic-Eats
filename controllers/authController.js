@@ -4,6 +4,20 @@ const User = require('../models/User');
 const { sendOTP, verifyOTP } = require('../utils/sms');
 const { sendEmailOTP, verifyEmailOTP, sendWelcomeEmail } = require('../utils/email');
 
+// Validate email format and catch common typos like double .com
+const isValidEmail = (email) => {
+    // Standard email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return false;
+
+    // Reject repeated TLD patterns like .com.com, .in.in, .org.org
+    const domain = email.split('@')[1];
+    if (/\.(com|net|org|in|co|io|dev)\.\1$/i.test(domain)) return false;
+    if (/\.(com){2,}/i.test(domain)) return false;
+
+    return true;
+};
+
 // Generate short-lived Access Token (15 minutes)
 const generateAccessToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -27,12 +41,20 @@ const hashToken = (token) => {
 // @route   POST /api/auth/register
 exports.register = async (req, res, next) => {
     try {
-        const { fullName, email, password, phone } = req.body;
+        const { fullName, password, phone } = req.body;
+        const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
 
         if (!fullName || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: 'Please provide fullName, email, and password'
+            });
+        }
+
+        if (!isValidEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide a valid email address'
             });
         }
 

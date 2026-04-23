@@ -5,6 +5,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 
 // Load env vars
 dotenv.config();
@@ -15,11 +17,40 @@ const menuRoutes = require('./routes/menuRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const deliveryRoutes = require('./routes/deliveryRoutes');
 
 // Import error handler
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
+const server = http.createServer(app);
+
+// Socket.IO setup
+const io = new Server(server, {
+    cors: {
+        origin: process.env.NODE_ENV === 'production'
+            ? false
+            : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
+        methods: ['GET', 'POST']
+    }
+});
+
+// Store io instance on app for use in controllers
+app.set('io', io);
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+    console.log('📍 Tracking client connected:', socket.id);
+
+    socket.on('join-tracking', (partnerId) => {
+        socket.join(`track-${partnerId}`);
+        console.log(`📍 Client joined tracking room: track-${partnerId}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('📍 Tracking client disconnected:', socket.id);
+    });
+});
 
 // Trust first proxy (fixes express-rate-limit X-Forwarded-For warning)
 app.set('trust proxy', 1);
@@ -90,6 +121,7 @@ app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/delivery', deliveryRoutes);
 
 // Base API endpoint
 app.get('/api', (req, res) => {
@@ -135,10 +167,20 @@ const startServer = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('✅ MongoDB connected successfully');
 
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`📡 API available at http://localhost:${PORT}/api`);
+            console.log(`📍 Socket.IO enabled for live tracking`);
             console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+
+            // Periodic stale partner check (every 60 seconds)
+            const { checkStalePartners } = require('./utils/assignmentService');
+            setInterval(() => {
+                checkStalePartners(io).catch(err =>
+                    console.error('Stale partner check error:', err.message)
+                );
+            }, 60 * 1000);
+            console.log('🔄 Stale partner monitor started (60s interval)');
         });
     } catch (error) {
         console.error('❌ MongoDB connection failed:', error.message);

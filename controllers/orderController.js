@@ -5,6 +5,7 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { sendOrderConfirmation } = require('../utils/sms');
 const { sendOrderEmail } = require('../utils/email');
+const { assignPartnerToOrder } = require('../utils/assignmentService');
 
 // @desc    Create a new order
 // @route   POST /api/orders
@@ -123,6 +124,12 @@ exports.createOrder = async (req, res, next) => {
         if (user?.email) {
             sendOrderEmail(user.email, order);
         }
+
+        // Auto-assign nearest delivery partner for COD (non-blocking)
+        const io = req.app.get('io');
+        assignPartnerToOrder(order._id, io, req).catch(err =>
+            console.error('Auto-assign on COD failed:', err.message)
+        );
     } catch (error) {
         next(error);
     }
@@ -159,6 +166,12 @@ exports.verifyPayment = async (req, res, next) => {
                 sendOrderEmail(user.email, order);
             }
 
+            // Auto-assign nearest delivery partner after successful payment (non-blocking)
+            const io = req.app.get('io');
+            assignPartnerToOrder(order._id, io, req).catch(err =>
+                console.error('Auto-assign on payment failed:', err.message)
+            );
+
             return res.status(200).json({ success: true, message: "Payment verified successfully", order });
         } else {
             return res.status(400).json({ success: false, message: "Invalid payment signature!" });
@@ -173,6 +186,7 @@ exports.verifyPayment = async (req, res, next) => {
 exports.getMyOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({ user: req.user.id })
+            .populate('deliveryPartner', 'name phone vehicleType vehicleNumber currentLocation lastLocationAt')
             .sort({ createdAt: -1 });
 
         res.json({
@@ -192,7 +206,7 @@ exports.getOrder = async (req, res, next) => {
         const order = await Order.findOne({
             _id: req.params.id,
             user: req.user.id
-        });
+        }).populate('deliveryPartner', 'name phone vehicleType vehicleNumber currentLocation lastLocationAt');
 
         if (!order) {
             return res.status(404).json({

@@ -206,6 +206,7 @@ exports.getOrders = async (req, res, next) => {
         const [orders, total] = await Promise.all([
             Order.find(filter)
                 .populate('user', 'fullName email phone')
+                .populate('deliveryPartner')
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit),
@@ -229,8 +230,9 @@ exports.getOrders = async (req, res, next) => {
 exports.updateOrderStatus = async (req, res, next) => {
     try {
         const { status } = req.body;
+        const { freePartner } = require('../utils/assignmentService');
 
-        const validStatuses = ['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'];
+        const validStatuses = ['pending', 'confirmed', 'preparing', 'assigned', 'picked_up', 'out_for_delivery', 'shipped', 'delivered', 'cancelled'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({
                 success: false,
@@ -247,9 +249,9 @@ exports.updateOrderStatus = async (req, res, next) => {
 
         // If cancelled, restore stock
         if (status === 'cancelled') {
-            const order = await Order.findById(req.params.id);
-            if (order && order.status !== 'cancelled') {
-                for (const item of order.items) {
+            const existingOrder = await Order.findById(req.params.id);
+            if (existingOrder && existingOrder.status !== 'cancelled') {
+                for (const item of existingOrder.items) {
                     await MenuItem.findByIdAndUpdate(item.menuItem, {
                         $inc: { stock: item.quantity }
                     });
@@ -258,12 +260,27 @@ exports.updateOrderStatus = async (req, res, next) => {
         }
 
         const order = await Order.findByIdAndUpdate(req.params.id, updates, { new: true })
-            .populate('user', 'fullName email phone');
+            .populate('user', 'fullName email phone')
+            .populate('deliveryPartner');
 
         if (!order) {
             return res.status(404).json({
                 success: false,
                 message: 'Order not found'
+            });
+        }
+
+        // Free delivery partner on delivered/cancelled
+        if (['delivered', 'cancelled'].includes(status) && order.deliveryPartner) {
+            await freePartner(order._id, req.app.get('io'));
+        }
+
+        // Emit real-time status update via Socket.IO
+        const io = req.app.get('io');
+        if (io) {
+            io.emit(`order-${order._id}`, {
+                type: 'status_update',
+                status: order.status
             });
         }
 
@@ -310,6 +327,71 @@ exports.getUsers = async (req, res, next) => {
             total,
             page: pageNum,
             pages: Math.ceil(total / limit)
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Update user details (admin)
+// @route   PUT /api/admin/users/:id
+exports.updateUser = async (req, res, next) => {
+    try {
+        const { fullName, email, phone, role } = req.body;
+        const updates = {};
+        if (fullName) updates.fullName = fullName;
+        if (email) updates.email = email;
+        if (phone !== undefined) updates.phone = phone;
+        if (role && ['user', 'admin'].includes(role)) updates.role = role;
+
+        const user = await User.findByIdAndUpdate(req.params.id, updates, {
+            new: true,
+            runValidators: true
+        }).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'User updated',
+            user
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete user (admin)
+// @route   DELETE /api/admin/users/:id
+exports.deleteUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Prevent deleting admin accounts
+        if (user.role === 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Cannot delete admin accounts'
+            });
+        }
+
+        await User.findByIdAndDelete(req.params.id);
+
+        res.json({
+            success: true,
+            message: 'User deleted successfully'
         });
     } catch (error) {
         next(error);

@@ -69,8 +69,40 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'],
+        enum: [
+            'pending',          // awaiting payment (online) or initial state
+            'confirmed',        // payment verified / COD accepted
+            'preparing',        // kitchen is preparing the food
+            'assigned',         // delivery partner assigned, awaiting pickup
+            'picked_up',        // partner picked up from restaurant
+            'out_for_delivery', // partner is en route to customer
+            'delivered',        // order delivered successfully
+            'shipped',          // legacy — treated as out_for_delivery
+            'cancelled'         // order cancelled
+        ],
         default: 'pending'
+    },
+    deliveryPartner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'DeliveryPartner',
+        default: null
+    },
+    trackingToken: {
+        type: String,
+        default: ''
+    },
+    // Assignment tracking for retry logic
+    assignedAt: {
+        type: Date,
+        default: null
+    },
+    assignmentRetries: {
+        type: Number,
+        default: 0
+    },
+    lastRetryAt: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true
@@ -78,5 +110,6 @@ const orderSchema = new mongoose.Schema({
 
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ status: 1 });
+orderSchema.index({ status: 1, assignmentRetries: 1 }); // for retry queries
 
 module.exports = mongoose.model('Order', orderSchema);
