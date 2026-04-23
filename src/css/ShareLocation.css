@@ -1,0 +1,303 @@
+/* ═══════════════════════════════════════════════════
+   Share Location Page (Delivery Partner Dashboard)
+   ═══════════════════════════════════════════════════ */
+
+.share-loc-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 20px;
+    font-family: var(--font-body);
+}
+
+.share-loc-card {
+    background: #fff;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 24px;
+    padding: 32px 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeInUp 0.5s ease;
+}
+
+.share-loc-header {
+    margin-bottom: 20px;
+}
+
+.pulse-icon {
+    font-size: 3rem;
+    display: inline-block;
+    margin-bottom: 12px;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.share-loc-header h2 {
+    font-family: var(--font-heading);
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.share-loc-header p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* ── Current Order Card ── */
+.share-loc-order {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.share-loc-order h4 {
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin-bottom: 12px;
+}
+
+.order-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.order-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.order-info-item span {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.order-info-item strong {
+    font-size: 0.9rem;
+    color: #0f172a;
+}
+
+.status-assigned { color: #2563eb !important; }
+.status-picked_up { color: #f59e0b !important; }
+.status-out_for_delivery { color: #f97316 !important; }
+.status-delivered { color: #16a34a !important; }
+
+.order-customer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.customer-call {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.order-drop {
+    font-size: 0.85rem;
+    color: #64748b;
+    padding: 8px 0;
+    border-top: 1px solid #e2e8f0;
+    line-height: 1.5;
+}
+
+.order-items-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.order-items-list span {
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.share-loc-order-loading,
+.share-loc-no-order {
+    padding: 20px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+/* Status Badges */
+.share-loc-status {
+    margin-bottom: 20px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.status-badge.idle {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.status-badge.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* Error Message */
+.share-loc-error {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+/* Coordinates Info */
+.share-loc-details {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.detail-item span {
+    color: #64748b;
+}
+
+.detail-item strong {
+    color: #0f172a;
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+/* Actions */
+.share-loc-actions button {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-start {
+    background: linear-gradient(135deg, #FC8019 0%, #ff6b00 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(252, 128, 25, 0.3);
+}
+
+.btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(252, 128, 25, 0.4);
+}
+
+.btn-stop {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btn-stop:hover {
+    background: #dc2626;
+}
+
+.btn-status-update {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.btn-status-update:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-status-update:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Note */
+.share-loc-note {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    line-height: 1.5;
+}

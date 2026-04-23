@@ -7,6 +7,9 @@ const statusColors = {
     pending: "#f59e0b",
     confirmed: "#3b82f6",
     preparing: "#8b5cf6",
+    assigned: "#6366f1",
+    picked_up: "#0ea5e9",
+    out_for_delivery: "#f97316",
     shipped: "#06b6d4",
     delivered: "#22c55e",
     cancelled: "#ef4444"
@@ -46,7 +49,7 @@ const OrderHistory = () => {
             <section className="orders-content">
                 {/* Filter Tabs */}
                 <div className="order-filters">
-                    {["all", "pending", "confirmed", "preparing", "shipped", "delivered", "cancelled"].map(s => (
+                    {["all", "pending", "confirmed", "preparing", "assigned", "picked_up", "out_for_delivery", "delivered", "cancelled"].map(s => (
                         <button key={s} className={`filter-btn ${filter === s ? "active" : ""}`} onClick={() => setFilter(s)}>
                             {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
                         </button>
@@ -121,12 +124,22 @@ const OrderHistory = () => {
                                                 }</p>
                                             </div>
                                         )}
-                                        <button
-                                            className="invoice-link-btn"
-                                            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}/invoice`) }}
-                                        >
-                                            📄 View Invoice
-                                        </button>
+                                        <div className="order-action-buttons">
+                                            <button
+                                                className="invoice-link-btn"
+                                                onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}/invoice`) }}
+                                            >
+                                                📄 View Invoice
+                                            </button>
+                                            {order.trackingToken && order.status !== "delivered" && order.status !== "cancelled" && (
+                                                <button
+                                                    className="invoice-link-btn track-btn"
+                                                    onClick={(e) => { e.stopPropagation(); window.open(`/track/${order._id}/${order.trackingToken}`, '_blank') }}
+                                                >
+                                                    📍 Track Order
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                             </div>

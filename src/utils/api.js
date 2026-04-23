@@ -316,3 +316,72 @@ export const adminGetOrders = (params) => {
 
 export const adminUpdateOrderStatus = (id, status) =>
     apiFetch(`/api/admin/orders/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) });
+
+// ──── Admin User Management ────
+export const adminUpdateUser = (id, data) =>
+    apiFetch(`/api/admin/users/${id}`, { method: "PUT", body: JSON.stringify(data) });
+
+export const adminDeleteUser = (id) =>
+    apiFetch(`/api/admin/users/${id}`, { method: "DELETE" });
+
+// ──── Admin Delivery Partner API ────
+export const adminGetDeliveryPartners = (params) => {
+    const query = new URLSearchParams();
+    if (params?.search) query.set("search", params.search);
+    if (params?.available !== undefined) query.set("available", params.available);
+    if (params?.page) query.set("page", params.page);
+    const qs = query.toString();
+    return apiFetch(`/api/admin/delivery-partners${qs ? `?${qs}` : ""}`);
+};
+
+export const adminCreateDeliveryPartner = (data) =>
+    apiFetch("/api/admin/delivery-partners", { method: "POST", body: JSON.stringify(data) });
+
+export const adminUpdateDeliveryPartner = (id, data) =>
+    apiFetch(`/api/admin/delivery-partners/${id}`, { method: "PUT", body: JSON.stringify(data) });
+
+export const adminDeleteDeliveryPartner = (id) =>
+    apiFetch(`/api/admin/delivery-partners/${id}`, { method: "DELETE" });
+
+export const adminAssignDeliveryPartner = (orderId, deliveryPartnerId) =>
+    apiFetch(`/api/admin/orders/${orderId}/assign`, {
+        method: "PUT",
+        body: JSON.stringify({ deliveryPartnerId })
+    });
+
+// ──── Public Tracking API (no auth) ────
+export const getTracking = async (orderId, token) => {
+    const response = await fetch(`${BASE_URL}/api/delivery/track/${orderId}/${token}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Tracking info not found");
+    return data;
+};
+
+export const updateDeliveryLocation = async (partnerId, lat, lng) => {
+    const response = await fetch(`${BASE_URL}/api/delivery/location/${partnerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Failed to update location");
+    return data;
+};
+
+export const getPartnerOrder = async (partnerId) => {
+    const response = await fetch(`${BASE_URL}/api/delivery/partner/${partnerId}/order`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Failed to fetch order");
+    return data;
+};
+
+export const updateOrderStatusByPartner = async (orderId, status, partnerId) => {
+    const response = await fetch(`${BASE_URL}/api/delivery/order/${orderId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, partnerId })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Failed to update status");
+    return data;
+};

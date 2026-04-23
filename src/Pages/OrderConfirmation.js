@@ -55,7 +55,7 @@ const OrderConfirmation = () => {
                     </div>
                     <div className="detail-row">
                         <span>Estimated Delivery</span>
-                        <span>30-45 minutes</span>
+                        <span>{order.status === 'delivered' ? 'Delivered' : order.deliveryPartner ? 'On the way' : 'Assigning partner...'}</span>
                     </div>
                 </div>
 
@@ -89,6 +89,9 @@ const OrderConfirmation = () => {
 
                 <div className="confirm-actions">
                     <button className="primary-btn" onClick={() => navigate(`/orders/${order._id}/invoice`)}>📄 View Invoice</button>
+                    {order.trackingToken && order.status !== "delivered" && order.status !== "cancelled" && (
+                        <button className="primary-btn" style={{ background: "linear-gradient(135deg, #2563eb, #7c3aed)" }} onClick={() => window.open(`/track/${order._id}/${order.trackingToken}`, '_blank')}>📍 Track Order</button>
+                    )}
                     <button className="secondary-btn" onClick={() => navigate("/menu")}>Order More</button>
                     <button className="secondary-btn" onClick={() => navigate("/orders")}>View All Orders</button>
                 </div>

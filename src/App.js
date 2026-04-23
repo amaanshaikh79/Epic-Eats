@@ -23,18 +23,22 @@ const Profile = lazy(() => import("./Pages/Profile.js"))
 const OrderHistory = lazy(() => import("./Pages/OrderHistory.js"))
 const OrderConfirmation = lazy(() => import("./Pages/OrderConfirmation.js"))
 const Invoice = lazy(() => import("./Pages/Invoice.js"))
+const TrackOrder = lazy(() => import("./Pages/TrackOrder.js"))
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard.js"))
 const AdminProducts = lazy(() => import("./Pages/Admin/AdminProducts.js"))
 const AdminOrders = lazy(() => import("./Pages/Admin/AdminOrders.js"))
 const AdminCustomers = lazy(() => import("./Pages/Admin/AdminCustomers.js"))
+const AdminDeliveryPartners = lazy(() => import("./Pages/Admin/AdminDeliveryPartners.js"))
+const ShareLocation = lazy(() => import("./Pages/ShareLocation.js"))
 
 const App = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const isTrackRoute = location.pathname.startsWith("/track") || location.pathname.startsWith("/delivery/share-location");
 
   return (
     <div>
-      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && !isTrackRoute && <Navbar />}
 
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
@@ -51,6 +55,10 @@ const App = () => {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/menu" element={<Menu />} />
 
+          {/* Public tracking page — no auth required */}
+          <Route path="/track/:orderId/:token" element={<TrackOrder />} />
+          <Route path="/delivery/share-location/:partnerId" element={<ShareLocation />} />
+
           {/* Protected — requires authentication */}
           <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
@@ -63,10 +71,11 @@ const App = () => {
           <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
           <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
           <Route path="/admin/customers" element={<AdminRoute><AdminCustomers /></AdminRoute>} />
+          <Route path="/admin/delivery-partners" element={<AdminRoute><AdminDeliveryPartners /></AdminRoute>} />
         </Routes>
       </Suspense>
 
-      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && !isTrackRoute && <Footer />}
     </div>
   )
 }
